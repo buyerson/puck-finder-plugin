@@ -30,9 +30,10 @@ The City of Ottawa uses ActiveNet/ActiveCommunities (`anc.ca.apm.activecommuniti
 2. Create a new tab and navigate to `https://anc.ca.apm.activecommunities.com/ottawa/reservation/search` (needed to establish browser session context)
 3. Wait 3 seconds for the SPA to load
 4. Store the facility list on `window.__facilities`
-5. Query each month (today through August 31st) as a separate JavaScript call, querying all 52 facilities in batches of 10
-6. After all months are queried, build session objects and submit to the API in monthly chunks
-7. Present a summary of available slots
+5. **Resolve arenas** — fetch existing arenas from the API, compare against the scan's unique location names, and auto-create any missing arenas before submitting sessions
+6. Query each month (today through August 31st) as a separate JavaScript call, querying all 52 facilities in batches of 10
+7. After all months are queried, build session objects and submit to the API in monthly chunks
+8. Present a summary of available slots
 
 ### JavaScript Extraction Strategy
 
@@ -76,11 +77,48 @@ GET https://anc.ca.apm.activecommunities.com/ottawa/rest/reservation/resource/av
 - `daily_details[].times[].start_time` / `end_time` - time in HH:MM:SS format
 - `daily_details[].times[].is_cross_day` - true if end time is past midnight
 
+### Step 5: Resolve Arenas (Auto-Create Missing)
+
+Before submitting sessions, ensure all arena locations exist in the database. This prevents sessions from landing in `unresolved_locations`.
+
+- Fetches existing arenas via `GET /arenas` and builds a set of known aliases (case-insensitive)
+- Compares unique location names from `window.__facilities` against known aliases
+- Creates missing arenas via `POST /arenas` with `name`, auto-generated `slug`, `city: "Ottawa"`, and an alias matching the location string
+
+```javascript
+(async () => {
+  const API = 'https://erjeeuhlgfclrcpirprj.supabase.co/functions/v1/puck-finder-api';
+  const HEADERS = { 'x-api-key': 'pf-write-k8x7m2nQ9vR4', 'Content-Type': 'application/json' };
+
+  // 1. Get existing arenas + aliases
+  const res = await fetch(API + '/arenas', { headers: HEADERS });
+  const { data: arenas } = await res.json();
+  const knownAliases = new Set();
+  arenas.forEach(a => a.app_arena_aliases.forEach(x => knownAliases.add(x.alias.toLowerCase())));
+
+  // 2. Get unique locations from facility list
+  const locations = [...new Set(window.__facilities.map(f => f.center))];
+
+  // 3. Create missing arenas
+  const missing = locations.filter(loc => !knownAliases.has(loc.toLowerCase()));
+  const created = [];
+  for (const name of missing) {
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const r = await fetch(API + '/arenas', {
+      method: 'POST', headers: HEADERS,
+      body: JSON.stringify({ name, slug, city: 'Ottawa', aliases: [name] })
+    });
+    created.push({ name, slug, status: r.status });
+  }
+  return `Arenas checked: ${locations.length}, missing: ${missing.length}, created: ${JSON.stringify(created)}`;
+})()
+```
+
 ### Batch Query Strategy — Monthly Chunks
 
 **CRITICAL: Query in monthly chunks, NOT the full date range at once.** Querying 52 facilities × 6 months in a single JavaScript call produces responses too large for the Chrome extension and will cause disconnects/timeouts.
 
-**Step 1:** Store the facility list on `window.__facilities` using the compact format:
+**Step 4a:** Store the facility list on `window.__facilities` using the compact format:
 
 ```javascript
 window.__facilities = [
@@ -92,7 +130,7 @@ window.__allSlots = [];
 'Facilities stored: ' + window.__facilities.length;
 ```
 
-**Step 2:** For each month from today through August 31st, run a **separate** JavaScript call:
+**Step 6a:** For each month from today through August 31st, run a **separate** JavaScript call:
 
 ```javascript
 // Run this ONCE PER MONTH — adjust start/end for each month
@@ -126,7 +164,7 @@ window.__allSlots = [];
 
 Repeat for each month: March → April → May → June → July → August (6 separate JS calls).
 
-**Step 3:** After all months are queried, build session objects and submit to the API **one month at a time** (see API Submission below).
+**Step 7a:** After all months are queried, build session objects and submit to the API **one month at a time** (see API Submission below).
 
 ### Date Range Rules
 

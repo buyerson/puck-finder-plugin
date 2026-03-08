@@ -1,6 +1,6 @@
 {
   "name": "puck-finder",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "description": "Scan Ottawa hockey program providers for availability, sync results to the Puck Finder backend, and run QA tests on the Puck Finder web app",
   "author": {
     "name": "John Kotowski"
