@@ -1,0 +1,4 @@
+.DS_Store
+.mcpb-cache/
+data/
+*.json.bak

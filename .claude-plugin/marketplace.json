@@ -1,0 +1,17 @@
+{
+  "name": "puck-finder",
+  "owner": {
+    "name": "John Kotowski"
+  },
+  "metadata": {
+    "description": "Scan Ottawa hockey program providers for session availability and sync results to the Puck Finder backend."
+  },
+  "plugins": [
+    {
+      "name": "puck-finder",
+      "source": ".",
+      "description": "Scan Ottawa hockey program providers for availability, sync results to the Puck Finder backend, and run QA tests on the Puck Finder web app",
+      "version": "0.4.0"
+    }
+  ]
+}
