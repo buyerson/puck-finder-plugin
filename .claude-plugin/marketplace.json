@@ -11,7 +11,7 @@
       "name": "puck-finder",
       "source": "./",
       "description": "Scan Ottawa hockey program providers for availability, sync results to the Puck Finder backend, and run QA tests on the Puck Finder web app",
-      "version": "0.6.0"
+      "version": "0.7.0"
     }
   ]
 }

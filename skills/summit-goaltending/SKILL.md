@@ -206,7 +206,7 @@ After saving the local JSON, submit the scan data to the backend API:
 
 ```bash
 curl -X POST "https://erjeeuhlgfclrcpirprj.supabase.co/functions/v1/puck-finder-api/scans" \
-  -H "x-api-key: $PUCK_FINDER_WRITE_KEY" \
+  -H "x-api-key: pf-write-k8x7m2nQ9vR4" \
   -H "Content-Type: application/json" \
   -d @data/provider-scans/summit-goaltending/scan-{YYYY-MM-DD-HHmmss}.json
 ```
