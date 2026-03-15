@@ -16,6 +16,12 @@ Check https://ashleyholmes.uplifterinc.com/registration/ for available hockey pr
 5. For locations with multiple rinks/pads, put the specific rink name in a separate field if available, but keep location as the facility name only (e.g. "Pinecrest Recreation Complex", NOT "Pinecrest Recreation Complex (Barbara Ann Scott)").
 6. Use the program name exactly as listed on the schedule. Do not reformat age groups or add arena names to the program name — the arena goes in location.
 
+## Arena/Location Naming Rules
+
+- Before creating a new arena, check if it already exists by searching the `GET /arenas?q=` endpoint with a partial name match.
+- Use the SHORT facility name (e.g. "Fred Barrett Arena", not "Fred G. Barrett Arena"). Do not append neighborhood, city, or rink-pad names to the arena name.
+- If the arena already exists under a slightly different name, use the existing arena and add the variant as an alias via `PUT /arenas/:slug` with the `aliases` field, rather than creating a new arena.
+
 ## Workflow
 
 1. Navigate to https://ashleyholmes.uplifterinc.com/registration/
