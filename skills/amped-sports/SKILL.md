@@ -34,21 +34,45 @@ Do NOT attempt to use WebFetch or other non-browser tools - the page requires Ja
 ## Workflow
 
 1. **Verify Chrome extension is available** by calling `mcp__claude-in-chrome__tabs_context_mcp`
-2. Navigate to https://ampedsports.playbookapi.com/programs/register/
-3. The page shows program categories as expandable sections
-4. Click each category to expand and reveal programs:
-   - **Golf Simulator** (skip - not hockey)
-   - **Player High Performance** - competitive programs
-   - **Player Development** - open/developmental programs
-5. Scroll through each expanded category to capture ALL programs
-6. For each program card, capture:
-   - Program name (includes age/birth year info)
+2. Navigate to the **category pages directly** (more reliable than expanding sections on the main page):
+   - `https://ampedsports.playbookapi.com/programs/register/player_high_performance/` — competitive programs
+   - `https://ampedsports.playbookapi.com/programs/register/player_development/` — open/development programs
+   - Skip Golf Simulator, Team Training, and Ice Rental categories
+3. On each category page, extract the full page text with `document.body.innerText`
+4. Parse program blocks from the text (see extraction notes below)
+5. For each program, capture:
+   - Program name (strip birth years from name — put them in min/max_birth_year fields)
    - Category (High Performance vs Development)
    - Schedule (day/time)
    - Location (if shown)
    - Number of available sessions (e.g., "30 Class Sessions available")
    - Price (if shown)
    - Status
+
+## DOM Extraction Notes
+
+The Playbook API page renders program blocks as text. Each program block contains:
+- Program name (bold, with age/birth year info in parentheses)
+- Schedule line (e.g., "Tuesdays/Thursdays 4-5pm (April, May, June)")
+- Location (e.g., "The AMPED Sports Lab")
+- Competitive restriction note (e.g., "*Competitive Players only*")
+- Action button ("View Class Sessions" or "View Session Packs")
+- Session count (e.g., "48 Class Sessions available")
+
+Extract using `document.body.innerText` — the page structure is flat text, not a structured table. Build one session per program (not per individual class session).
+
+### Source URLs
+
+Use the category page URL as `source_url` for each session:
+- High Performance programs: `https://ampedsports.playbookapi.com/programs/register/player_high_performance/`
+- Development programs: `https://ampedsports.playbookapi.com/programs/register/player_development/`
+
+### Location Mapping
+
+| Website Name | Arena Name |
+|-------------|------------|
+| The AMPED Sports Lab | Amped Sports Lab |
+| Tony Graham Recreation Complex | Tony Graham Recreation Complex |
 
 ## Status Determination
 
