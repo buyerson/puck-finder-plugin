@@ -26,7 +26,7 @@ Check https://ashleyholmes.uplifterinc.com/registration/ for available hockey pr
 
 1. Navigate to https://ashleyholmes.uplifterinc.com/registration/
 2. The page displays "Program Registrations" with a list of all programs
-3. Scroll through the entire page to capture ALL programs
+3. Extract programs using JavaScript (see DOM Extraction below)
 4. For each program, determine its **status** based on visual indicators
 5. Note program details for each program:
    - Program name and type
@@ -37,6 +37,82 @@ Check https://ashleyholmes.uplifterinc.com/registration/ for available hockey pr
    - Price
    - **Status** (available, limited, waitlist, sold_out)
    - Spots left (if shown, e.g., "2 spot(s) left")
+
+## DOM Extraction Strategy
+
+The Uplifter page is a KnockoutJS app. Programs are rendered in a `<table class="prodListItems">` with each program as a `<tr>`. **Do NOT use `.list-group-item`, `.program-card`, or scroll-based extraction** — iterate the table rows instead.
+
+### JavaScript Extraction
+
+```javascript
+var rows = document.querySelectorAll('table.prodListItems > tbody > tr');
+var programs = [];
+rows.forEach(function(tr) {
+  var titleEl = tr.querySelector('.itemTitle');
+  if (!titleEl) return;
+  var name = titleEl.innerText.replace('» View Details', '').trim();
+  var text = tr.innerText;
+
+  var status = 'available';
+  if (/\bFULL\b/.test(text)) status = 'waitlist';
+  if (/\b0 spot\(s\) left\b/.test(text)) status = 'waitlist';
+  else if (/[1-9]\d* spot\(s\) left/.test(text)) status = 'limited';
+
+  var spotsMatch = text.match(/(\d+) spot\(s\) left/);
+  var waitingMatch = text.match(/\((\d+) Waiting\)/);
+  var dateMatch = text.match(/Start & End Date:\s*\n?\s*([A-Z][a-z]+ \d+, \d{4}\s*-\s*[A-Z][a-z]+ \d+, \d{4})/);
+  var dayTimeMatch = text.match(/Day \/ Time \/ Location:\s*\n?\s*([^\n]+)/);
+  var eventsMatch = text.match(/(\d+) Events?/);
+  var allPrices = text.match(/\$[\d,.]+/g);
+  var totalPrice = allPrices && allPrices.length > 0
+    ? parseFloat(allPrices[allPrices.length-1].replace('$','').replace(',',''))
+    : null;
+
+  programs.push({
+    name: name,
+    status: status,
+    spots: spotsMatch ? parseInt(spotsMatch[1]) : null,
+    waiting: waitingMatch ? parseInt(waitingMatch[1]) : null,
+    dates: dateMatch ? dateMatch[1].trim() : null,
+    dayTime: dayTimeMatch ? dayTimeMatch[1].trim() : null,
+    events: eventsMatch ? parseInt(eventsMatch[1]) : null,
+    price: totalPrice,
+  });
+});
+```
+
+### Program Name Cleaning
+
+The raw program name from the DOM includes the arena in parentheses and a sport suffix. Strip these before saving:
+- Remove `(Arena Name)` — the arena goes in `location`
+- Remove trailing `Hockey & Ringette` or `Hockey` — these are sport qualifiers, not the program name
+
+Example: `"U12 & Older Edge/Speed COMP (Mlacak Arena Kanata) Hockey & Ringette"` → program_name: `"U12 & Older Edge/Speed COMP"`, location: `"John Mlacak Arena"`
+
+### Location Name Mapping
+
+Map the short names from the website to full arena names used in the database:
+
+| Website Name | Arena Name |
+|-------------|------------|
+| Mlacak Arena Kanata | John Mlacak Arena |
+| Minto Rec. / Minto Rec. Barrhaven | Minto Recreation Complex |
+| Tony Graham Arena Kanata | Tony Graham Arena |
+| Amped SportsLab | Amped Sports Lab |
+| Bell Sensplex | Bell Sensplex |
+| Barbara Ann Acott Arena | Barbara Ann Scott Arena |
+| Carleton University | Carleton University Ice House |
+| Walter Baker | Walter Baker Sports Centre |
+| Cardel Rec. | Cardel Recreation Complex |
+| Nepean Sportsplex | Nepean Sportsplex |
+| Kemptville | Kemptville Arena |
+
+### Chrome Extension Output Limitation
+
+The Claude in Chrome extension blocks JavaScript output containing URL query strings (cookie/query filter). When extracting data:
+1. Extract session data WITHOUT source_url fields from the browser
+2. Add source_url mappings server-side (in bash/python) using the filter ID tables below
+3. Save the complete JSON locally, then submit via curl
 
 ## Filtered Source URLs (REQUIRED)
 
@@ -62,14 +138,24 @@ Base URL: `https://ashleyholmes.uplifterinc.com/registration/`
 | ID | Category Name | Programs |
 |----|--------------|----------|
 | 1 | Power skating Group lessons | Edge/Speed Fundamentals, Speed/Edge COMP group lessons |
-| 2 | Summer Conditioning Camps | Off-ice conditioning camps |
+| 2 | Summer Conditioning Camps | Off-ice conditioning camps, COMPETITIVE CONDITIONING CAMP |
 | 3 | Fundamentals | ELEVATE small group training |
-| 5 | Speed/Edge COMP | Edge/Speed COMP, Edge House/Comp, HOCKEY EDGE DEV + SHOOT-TO-SCORE |
-| 6 | Speed Development AA/AAA | AA/AAA Speed/Edge |
+| 4 | Little Tykes | Little Tykes beginner programs (U7, U8, U9) |
+| 5 | Speed/Edge COMP | Edge/Speed COMP, Edge House/Comp, Edge OPEN, HOCKEY EDGE DEV + SHOOT-TO-SCORE |
+| 6 | Speed Development AA/AAA | AA/AAA Speed/Edge, U18AAA/Junior A/B |
 | 8 | Pre-Tryout | PRE-TRYOUT AA/AAA single sessions |
-| 11 | March Break Camps | PRE-TRYOUT COMPETITIVE CONDITIONING CAMP |
+| 11 | March Break Camps | PRE-TRYOUT COMPETITIVE CONDITIONING CAMP (March Break only) |
 
 ### Category Level Filter IDs (PREFERRED — most specific)
+
+**Little Tykes (category 4):**
+
+| ID | Level |
+|----|-------|
+| 59 | U7 |
+| 19 | U7 (alternate) |
+| 20 | U8 |
+| 78 | U9-Hockey |
 
 **Speed/Edge COMP (category 5):**
 
