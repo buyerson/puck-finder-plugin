@@ -7,6 +7,15 @@ description: Check Ashley Holmes Training hockey program availability for the fa
 
 Check https://ashleyholmes.uplifterinc.com/registration/ for available hockey programs.
 
+## Program Naming Rules (CRITICAL for deduplication)
+
+1. Use the program/series name EXACTLY as it appears on the website. Do not rephrase, abbreviate, or embellish.
+2. Do NOT prepend dates, day names, or months to the program name. The date goes in start_date, not in program_name.
+3. If a program has a subtitle or qualifier in parentheses on the website, include it. If it doesn't, don't add one.
+4. For multi-day camps/series, use the SAME program_name for every session in the series. Differentiate sessions by start_date, not by name.
+5. For locations with multiple rinks/pads, put the specific rink name in a separate field if available, but keep location as the facility name only (e.g. "Pinecrest Recreation Complex", NOT "Pinecrest Recreation Complex (Barbara Ann Scott)").
+6. Use the program name exactly as listed on the schedule. Do not reformat age groups or add arena names to the program name — the arena goes in location.
+
 ## Workflow
 
 1. Navigate to https://ashleyholmes.uplifterinc.com/registration/

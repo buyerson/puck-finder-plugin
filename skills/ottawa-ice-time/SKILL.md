@@ -24,6 +24,15 @@ The City of Ottawa uses ActiveNet/ActiveCommunities (`anc.ca.apm.activecommuniti
 - Booked on the hour, 1-hour rental blocks
 - All facilities are "Arena LMI" type with max 30 attendees
 
+## Program Naming Rules (CRITICAL for deduplication)
+
+1. Use the program/series name EXACTLY as it appears on the website. Do not rephrase, abbreviate, or embellish.
+2. Do NOT prepend dates, day names, or months to the program name. The date goes in start_date, not in program_name.
+3. If a program has a subtitle or qualifier in parentheses on the website, include it. If it doesn't, don't add one.
+4. For multi-day camps/series, use the SAME program_name for every session in the series. Differentiate sessions by start_date, not by name.
+5. For locations with multiple rinks/pads, put the specific rink name in a separate field if available, but keep location as the facility name only (e.g. "Pinecrest Recreation Complex", NOT "Pinecrest Recreation Complex (Barbara Ann Scott)").
+6. Use only the facility name for location (e.g. "Pinecrest Recreation Complex"). Put the specific pad/rink name (e.g. "Barbara Ann Scott", "Ron Racette") in a rink_name or notes field if available, but NOT in program_name or location.
+
 ## Workflow
 
 1. **Verify Chrome extension is available** by calling `mcp__claude-in-chrome__tabs_context_mcp`
