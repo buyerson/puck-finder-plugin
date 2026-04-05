@@ -156,6 +156,8 @@ Save to: `data/provider-scans/amped-sports/scan-{YYYY-MM-DD-HHmmss}.json`
   "provider": "amped-sports",
   "scanned_at": "2026-02-21T14:00:00Z",
   "source_url": "https://ampedsports.playbookapi.com/programs/register/",
+  "scan_date_start": "2026-02-21",
+  "scan_date_end": "2026-06-30",
   "sessions": [
     {
       "program_name": "High Performance U13 (2015-2014)",
@@ -198,6 +200,12 @@ Save to: `data/provider-scans/amped-sports/scan-{YYYY-MM-DD-HHmmss}.json`
   }
 }
 ```
+
+### Scan Date Window (Required)
+
+- ALWAYS include `scan_date_start` (earliest `session_date` in the scan) and `scan_date_end` (latest `session_date` in the scan) in the payload
+- This tells the API to archive any active sessions from this provider within that date range that weren't included in this scan
+- This prevents stale/removed sessions from lingering in the database
 
 ### Submit to API
 

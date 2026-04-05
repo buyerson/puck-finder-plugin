@@ -225,6 +225,8 @@ Save to: `data/provider-scans/perfect-skating/scan-{YYYY-MM-DD-HHmmss}.json`
   "provider": "perfect-skating-ottawa",
   "scanned_at": "2026-01-20T10:30:00Z",
   "source_url": "https://ottawa.perfectskating.ca/collections/all",
+  "scan_date_start": "2026-04-20",
+  "scan_date_end": "2026-06-30",
   "sessions": [
     {
       "program_name": "Perfect Skating Program - Spring 2026 (Bell Sensplex)",
@@ -251,6 +253,12 @@ Save to: `data/provider-scans/perfect-skating/scan-{YYYY-MM-DD-HHmmss}.json`
   }
 }
 ```
+
+### Scan Date Window (Required)
+
+- ALWAYS include `scan_date_start` (earliest `session_date` in the scan) and `scan_date_end` (latest `session_date` in the scan) in the payload
+- This tells the API to archive any active sessions from this provider within that date range that weren't included in this scan
+- This prevents stale/removed sessions from lingering in the database
 
 ### Submit to API
 

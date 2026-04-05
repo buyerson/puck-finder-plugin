@@ -12,6 +12,8 @@ Save the scan JSON to the working directory (e.g., `/sessions/laughing-eager-far
   "provider": "nepean-hockey-school",
   "scanned_at": "2026-01-25T10:30:00Z",
   "source_url": "https://nepeanhockeyschool.com/available-sessions/",
+  "scan_date_start": "2026-01-28",
+  "scan_date_end": "2026-02-16",
   "sessions": [
     {
       "session_date": "2026-01-28",
@@ -46,6 +48,12 @@ Save the scan JSON to the working directory (e.g., `/sessions/laughing-eager-far
   }
 }
 ```
+
+### Scan Date Window (Required)
+
+- ALWAYS include `scan_date_start` (earliest `session_date` in the scan) and `scan_date_end` (latest `session_date` in the scan) in the payload
+- This tells the API to archive any active sessions from this provider within that date range that weren't included in this scan
+- This prevents stale/removed sessions from lingering in the database
 
 ### Field notes
 

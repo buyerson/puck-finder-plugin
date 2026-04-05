@@ -419,6 +419,8 @@ Save to: `data/provider-scans/ashley-holmes/scan-{YYYY-MM-DD-HHmmss}.json`
   "provider": "ashley-holmes",
   "scanned_at": "2026-01-20T10:30:00Z",
   "source_url": "https://ashleyholmes.uplifterinc.com/registration/",
+  "scan_date_start": "2026-01-06",
+  "scan_date_end": "2026-04-28",
   "sessions": [
     {
       "program_name": "U15-U18 AA/AAA Speed/Edge (Minto Rec.)",
@@ -466,6 +468,12 @@ Save to: `data/provider-scans/ashley-holmes/scan-{YYYY-MM-DD-HHmmss}.json`
   }
 }
 ```
+
+### Scan Date Window (Required)
+
+- ALWAYS include `scan_date_start` (earliest `session_date` in the scan) and `scan_date_end` (latest `session_date` in the scan) in the payload
+- This tells the API to archive any active sessions from this provider within that date range that weren't included in this scan
+- This prevents stale/removed sessions from lingering in the database
 
 ### Submit to API
 

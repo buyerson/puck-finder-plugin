@@ -259,6 +259,8 @@ Save to: `data/provider-scans/apex-hockey/scan-{YYYY-MM-DD-HHmmss}.json`
   "provider": "apex-hockey",
   "scanned_at": "2026-01-20T10:30:00Z",
   "source_url": "https://apexhockey.com/canada/ottawa/?la-state=OPEN_REGISTRATIONS_AND_UPCOMING",
+  "scan_date_start": "2026-02-06",
+  "scan_date_end": "2026-04-05",
   "sessions": [
     {
       "program_name": "Tier One Winter 2026 Hockey Classes (Bell Centennial Arena)",
@@ -304,6 +306,12 @@ Save to: `data/provider-scans/apex-hockey/scan-{YYYY-MM-DD-HHmmss}.json`
   }
 }
 ```
+
+### Scan Date Window (Required)
+
+- ALWAYS include `scan_date_start` (earliest `session_date` in the scan) and `scan_date_end` (latest `session_date` in the scan) in the payload
+- This tells the API to archive any active sessions from this provider within that date range that weren't included in this scan
+- This prevents stale/removed sessions from lingering in the database
 
 **IMPORTANT:** Every session object MUST include a `source_url` field with the direct LeagueApps booking link. Do NOT save the JSON without `source_url` on every session. Sessions sharing the same program name will have the same `source_url`.
 

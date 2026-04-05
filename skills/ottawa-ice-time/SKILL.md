@@ -341,6 +341,8 @@ Save to: `data/provider-scans/ottawa-ice-time/scan-{YYYY-MM-DD-HHmmss}.json`
   "provider": "ottawa-ice-time",
   "scanned_at": "2026-02-22T20:00:00Z",
   "source_url": "https://anc.ca.apm.activecommunities.com/ottawa/reservation/search",
+  "scan_date_start": "2026-02-25",
+  "scan_date_end": "2026-08-31",
   "sessions": [
     {
       "program_name": "Ice Rental - Bell Centennial Arena (BLCA)",
@@ -368,6 +370,12 @@ Save to: `data/provider-scans/ottawa-ice-time/scan-{YYYY-MM-DD-HHmmss}.json`
   }
 }
 ```
+
+### Scan Date Window (Required)
+
+- ALWAYS include `scan_date_start` (earliest `session_date` in the scan) and `scan_date_end` (latest `session_date` in the scan) in the payload
+- This tells the API to archive any active sessions from this provider within that date range that weren't included in this scan
+- This prevents stale/removed sessions from lingering in the database
 
 ### Program Name Convention
 
