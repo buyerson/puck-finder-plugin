@@ -35,9 +35,12 @@ The City of Ottawa uses ActiveNet/ActiveCommunities (`anc.ca.apm.activecommuniti
 
 ## Arena/Location Naming Rules
 
-- Before creating a new arena, check if it already exists by searching the `GET /arenas?q=` endpoint with a partial name match.
-- Use the SHORT facility name (e.g. "Fred Barrett Arena", not "Fred G. Barrett Arena"). Do not append neighborhood, city, or rink-pad names to the arena name.
-- If the arena already exists under a slightly different name, use the existing arena and add the variant as an alias via `PUT /arenas/:slug` with the `aliases` field, rather than creating a new arena.
+The Puck Finder schema separates **facilities** (buildings, in `app_arenas`) from **rinks** (ice surfaces, in `app_arena_rinks`). The City of Ottawa's ActiveNet system gives a numeric ID per rink — every facility ID in the table below is a rink.
+
+- `location` on each session must be the SHORT facility name (e.g. "Fred Barrett Arena", not "Fred G. Barrett Arena", and never with the rink pad appended). Do not embed neighborhood, city, or rink in `location`.
+- **`rink_external_id` on each session is the ActiveNet facility ID as a string** (e.g. `"1971"` for Ray Friel Rink 02). The backend looks this up against `app_arena_rinks.external_id` and sets the session's `rink_id` automatically. This is the canonical way to attach a session to a specific ice surface.
+- Before creating a new facility, check whether it exists by searching `GET /arenas?q=`. If the facility already exists under a slightly different name, add the variant via `PUT /arenas/:slug` with the `aliases` field — don't create a new arena row.
+- New facilities should be onboarded via `POST /arenas` with both `aliases[]` and `rinks[]` in a single payload. Each rink should set `external_source: "activenet"` and `external_id: "<facility_id>"` so future scans resolve cleanly.
 
 ## Workflow
 
@@ -412,7 +415,10 @@ For each month's slot data, build a session array and submit separately:
     return {
       program_name: `Ice Rental - ${s.center} (${s.rink})`,
       session_type: 'ice_rental', session_date: s.date, start_date: s.date, end_date: s.date,
-      day_of_week: dow, start_time: s.st, end_time: s.et, location: s.center, status: 'available',
+      day_of_week: dow, start_time: s.st, end_time: s.et,
+      location: s.center,                       // facility name only
+      rink_external_id: String(s.fid),          // ActiveNet rink ID — resolves to app_arena_rinks
+      status: 'available',
       source_url: `https://anc.ca.apm.activecommunities.com/ottawa/reservation/search/detail/${s.fid}`,
       price: null, min_birth_year: null, max_birth_year: null,
       notes: '1-hour ice rental. Book at ottawa.ca or call (613) 828-9629.'
