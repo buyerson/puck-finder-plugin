@@ -68,10 +68,18 @@ Save the scan JSON to the working directory (e.g., `/sessions/laughing-eager-far
 Submit the scan JSON to the Puck Finder API using curl:
 
 ```bash
-curl -X POST "https://erjeeuhlgfclrcpirprj.supabase.co/functions/v1/puck-finder-api/scans" \
+# Submit + assert: surface unresolved aliases, upsert mismatches, and stale-active drift.
+curl -s -X POST "https://erjeeuhlgfclrcpirprj.supabase.co/functions/v1/puck-finder-api/scans" \
   -H "x-api-key: pf-write-k8x7m2nQ9vR4" \
   -H "Content-Type: application/json" \
-  -d @scan-{YYYY-MM-DD-HHmmss}.json
+  -d @scan-{YYYY-MM-DD-HHmmss}.json \
+  | jq -r '
+      .data as $d
+      | "✓ upserted=\($d.sessions_upserted)/\($d.sessions_received) | archived=\($d.sessions_archived | length) | stale_active=\($d.stale_active_sessions // 0) | unresolved=\($d.unresolved_locations | length)",
+        (if ($d.unresolved_locations | length) > 0 then "  ⚠ unresolved: " + ($d.unresolved_locations | join("; ")) else empty end),
+        (if $d.sessions_upserted != $d.sessions_received then "  ⚠ upsert mismatch — investigate" else empty end),
+        (if ($d.stale_active_sessions // 0) > 0 then "  ⚠ stale_active=\($d.stale_active_sessions) — auto-archive missed something" else empty end)
+    '
 ```
 
 Replace the filename placeholder with the actual scan file path.
