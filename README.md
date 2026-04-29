@@ -33,3 +33,22 @@ Say any of:
 ## Data Persistence
 
 Scan results are submitted to the Puck Finder API via curl. The API key is embedded in each skill's persistence instructions.
+
+## Scan Submission Protocol (assertion-on-submit)
+
+Every provider skill that calls `POST /scans` MUST inspect the response and surface anomalies in its return string. The endpoint always returns:
+
+- `sessions_received` — number of sessions in the request body
+- `sessions_upserted` — number actually written
+- `sessions_archived` — array of sessions auto-archived in the scan window
+- `unresolved_locations` — string array of locations that didn't match an arena alias
+- `stale_active_sessions` — count of this provider's active sessions whose `start_date` is more than 7 days in the past (signals scan-window mismatch or program-name drift)
+- `scan_id` — UUID of the scan record
+
+Each skill's submit code should warn loudly when:
+
+- `unresolved_locations.length > 0` — an arena alias is missing; add it via `PUT /arenas/:slug`
+- `sessions_upserted !== sessions_received` — silent dedup or insert error
+- `stale_active_sessions > 0` — auto-archive isn't catching something; investigate before the next scan
+
+See `skills/ottawa-ice-time/SKILL.md` for the canonical implementation.

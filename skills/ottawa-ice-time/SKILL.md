@@ -434,7 +434,13 @@ For each month's slot data, build a session array and submit separately:
   const r = await fetch('https://erjeeuhlgfclrcpirprj.supabase.co/functions/v1/puck-finder-api/scans', {
     method: 'POST', headers: { 'x-api-key': 'pf-write-k8x7m2nQ9vR4', 'Content-Type': 'application/json' }, body
   });
-  return `March: ${r.status} - ${(await r.text()).substring(0, 300)}`;
+  const out = await r.json();
+  const d = out.data || {};
+  const issues = [];
+  if (d.unresolved_locations?.length) issues.push(`unresolved=${d.unresolved_locations.length} (${d.unresolved_locations.slice(0,5).join('; ')})`);
+  if (d.sessions_upserted !== sessions.length) issues.push(`upsert mismatch: sent ${sessions.length} got ${d.sessions_upserted}`);
+  if (d.stale_active_sessions > 0) issues.push(`stale active=${d.stale_active_sessions} (start_date >7d ago) — auto-archive missed something`);
+  return `March: ${r.status} upserted=${d.sessions_upserted}/${sessions.length} archived=${(d.sessions_archived||[]).length}${issues.length ? ' ⚠ ' + issues.join(' | ') : ' ✓'}`;
 })()
 ```
 
