@@ -22,6 +22,7 @@ Scans multiple Ottawa-area hockey and skating program websites using browser aut
 ## Requirements
 
 - **Claude in Chrome extension** must be running (all providers require browser automation)
+- The plugin version in `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` must stay in sync — Claude Desktop's marketplace reads the latter for auto-update detection.
 
 ## Usage
 
