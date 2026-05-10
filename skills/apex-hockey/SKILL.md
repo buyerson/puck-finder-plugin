@@ -154,6 +154,20 @@ Each LeagueApps camp detail page contains these fields in the sidebar:
 
 5. **Apply enrichment to all matching sessions:** Every session row sharing the same `source_url` gets the same `price`, `min_birth_year`, `max_birth_year`. Each row's `end_date` is calculated individually based on its own `session_date` + duration.
 
+### Class Detail Page Enrichment (also REQUIRED)
+
+`/classes/` URLs lack a structured "Minimum age / Maximum age / Age as of" sidebar — the eligibility is in the body description. Visit each unique `/classes/` URL and search the description for these patterns:
+
+| Pattern (case-insensitive) | Example | Maps to |
+|----|----|----|
+| `birth years? of YYYY[, YYYY]+(?:\\s*&\\s*YYYY)?` | "birth years of 2007, 2008, 2009 & 2010" | `min_birth_year=2007, max_birth_year=2010` |
+| `born YYYY ?[-/–to] ?YYYY` | "Born 2010-2014" | `min=2010, max=2014` |
+| `(\\d{4}) ?- ?(\\d{4}) ?(?:born|birth)` | "2008-2013 born players" | `min=2008, max=2013` |
+| `U(\\d+)[-/]U(\\d+)` | "U13-U16" | translate to birth years using current year as reference (e.g. 2026 - 16 = 2010 min, 2026 - 13 = 2013 max) |
+| `U(\\d+)\\+` | "U13+" | `max_birth_year = current_year - 13`; leave `min_birth_year` null |
+
+If multiple patterns match, prefer explicit birth years over U-codes. If no pattern matches, leave both `min_birth_year` and `max_birth_year` null. Apply the parsed years to every session row sharing that `source_url` (same as camp enrichment).
+
 ### Performance Skating Exception
 
 **IMPORTANT:** "Performance Skating" programs with `/camps/` URLs may actually be weekly `series`, not camps. Check the date range: if `Starts` to `Ends` spans many weeks (e.g., Apr 4 - Jun 13) with weekly Saturday sessions, classify as `session_type: "series"` instead of `camp`. The LeagueApps URL path is misleading in this case.

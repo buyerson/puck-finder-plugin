@@ -198,6 +198,19 @@ PDF filenames on the Sensplex site sometimes get renamed (e.g., `-1` suffix adde
 - ~~`Semi-Private-Lessons.pdf`~~ → correct: `Semi-Private-Lessons-1.pdf`
 - ~~`PD-Day-Hockey-Camps-1.pdf`~~ → correct: `2025-26-PD-Day-Hockey-Camps.pdf`
 
+## Bond Sports Summer Camps (bondsports.co)
+
+Full-day summer camps at Sensplex are sold via Bond Sports, not the sensplex.ca page. When scanning, also pull camp pages under `https://bondsports.co/activity/programs/CO_ED-youth-HOCKEY/` for season 11913 (Sensplex). Each camp page has the structured fields below. **Do not skip any of them — the Full Day Complete Player Development camp lost time + age data because earlier scans only parsed dates.**
+
+| Page label | Example | Maps to |
+|---|---|---|
+| `Dates` | "Jul 6 - Jul 10" | `start_date`, `end_date` |
+| `Days & Time` | "Mon-Fri 7:30AM - 5:15PM" | `day_of_week` (= "Monday" for the first day of a Mon-Fri camp), **`start_time = "07:30"`, `end_time = "17:15"`** |
+| `Price` | "$564" | `price` |
+| `<heading> N - M years old on Dec 31, YYYY` | "5 - 12 years old on Dec 31, 2025" | `min_birth_year = YYYY - max_age` (e.g. 2025-12 = 2013); **`max_birth_year = YYYY - min_age`** (e.g. 2025-5 = 2020) — be careful, easy to off-by-one |
+
+Use `session_type: 'camp'` for these. Use the bondsports URL as `source_url`. Set `day_of_week` to the first day name of the week range (e.g. "Monday" for Mon-Fri); the date span already encodes the rest.
+
 ## Output Format
 
 Organize programs by category:

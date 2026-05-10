@@ -1,6 +1,6 @@
 {
   "name": "puck-finder",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Scan Ottawa hockey program providers for session availability and sync results to Puck Finder.",
   "author": {
     "name": "John Kotowski"

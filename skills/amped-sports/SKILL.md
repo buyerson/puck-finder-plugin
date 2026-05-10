@@ -61,11 +61,15 @@ The Playbook API page renders program blocks as text. Each program block contain
 
 Extract using `document.body.innerText` — the page structure is flat text, not a structured table. Build one session per program (not per individual class session).
 
-### Source URLs
+### Source URLs (prefer deep links)
 
-Use the category page URL as `source_url` for each session:
+Each program block has a "View Class Sessions" or "View Session Packs" link. Inspect the `<a>` tag's `href` for the deep-link path — it looks like `/programs/register/<category>/<program-slug>/` and is unique per program. Use that as `source_url` so MC users can click straight through to the registration page they need.
+
+Fallback (only when the deep link can't be extracted): use the category page URL as `source_url`:
 - High Performance programs: `https://ampedsports.playbookapi.com/programs/register/player_high_performance/`
 - Development programs: `https://ampedsports.playbookapi.com/programs/register/player_development/`
+
+Generic registration root URLs (`/programs/register/`) without a program slug are NEVER acceptable as `source_url`.
 
 ### Location Mapping
 

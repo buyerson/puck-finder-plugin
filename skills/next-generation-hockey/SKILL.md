@@ -83,9 +83,23 @@ Create a **separate session entry** for each time slot. Status can vary per slot
 | Status | Indicator |
 |--------|-----------|
 | `available` | No "SOLD OUT" text near the session, registration link present |
-| `sold_out` | Red "SOLD OUT" text next to a specific time slot |
+| `sold_out` | Red "SOLD OUT" text next to a specific time slot, OR a cohort table line says `<year>: SOLD OUT` / `CLOSED` / `FULL` |
 | `limited` | Not typically shown on this site; default to `available` |
 | `waitlist` | Not typically shown; default to `available` |
+
+### Cohort status table (Spring 4v4)
+
+The `/hockey4v4` page lists a per-birth-year status table that drives availability for each cohort. It looks like:
+
+```
+2016: CLOSED
+2017: PLAYERS SOLD OUT, GOALIES SOLD OUT
+2018: PLAYERS SOLD OUT, GOALIES SOLD OUT
+2019: PLAYERS SOLD OUT, GOALIES SOLD OUT
+2020/21: SPACE AVAILABLE
+```
+
+When you see a `<year>: <status>` line, create one session per year with the matching status. Treat **`CLOSED`, `SOLD OUT`, `FULL`, `PLAYERS SOLD OUT`** all as `status: 'sold_out'`. Treat **`SPACE AVAILABLE`, `OPEN`, `OPEN REGISTRATION`** as `status: 'available'`. Use the program name `Spring 4v4 League - <YYYY> Division` for consistent dedup. The "as of <date>" line above the table is informational only — do not skip the parse just because the date is old.
 
 ## Session Type Classification
 
