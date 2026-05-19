@@ -419,7 +419,7 @@ For each month's slot data, build a session array and submit separately:
       location: s.center,                       // facility name only
       rink_external_id: String(s.fid),          // ActiveNet rink ID — resolves to app_arena_rinks
       status: 'available',
-      source_url: `https://anc.ca.apm.activecommunities.com/ottawa/reservation/search/detail/${s.fid}`,
+      source_url: `https://anc.ca.apm.activecommunities.com/ottawa/reservation/search/detail/${s.fid}?locale=en-US`,
       price: null, min_birth_year: null, max_birth_year: null,
       notes: '1-hour ice rental. Book at ottawa.ca or call (613) 828-9629.'
     };
@@ -460,7 +460,7 @@ const dayOfWeek = days[new Date(dateString + 'T00:00:00').getDay()];
 
 Each session's `source_url` should link directly to the facility's detail page:
 ```
-https://anc.ca.apm.activecommunities.com/ottawa/reservation/search/detail/{facilityId}
+https://anc.ca.apm.activecommunities.com/ottawa/reservation/search/detail/{facilityId}?locale=en-US
 ```
 
 ## Notes
