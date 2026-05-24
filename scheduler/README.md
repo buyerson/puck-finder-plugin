@@ -1,15 +1,32 @@
 # puck-finder scheduler
 
-Headless launchd jobs that run scanner skills on a schedule. v1 covers
-nepean-hockey-school daily at 03:00 ET; other providers come later via the
-same pattern.
+Daily launchd jobs that populate the puck-finder DB from each provider's
+source site. Two runners depending on whether the provider exposes a clean
+HTTP API.
 
 ## Architecture
+
+Two runner shapes, picked per provider:
+
+**Chrome-driven (LLM skill)** — for sites where the data only lives in the
+DOM (Wix, color-coded badges, etc.). Slow (~3min), needs Chrome up.
 
 ```
 launchd plist  ─▶  bin/bash run-scan.sh <skill>  ─▶  caffeinate -i  ─▶
   claude --dangerously-skip-permissions --chrome -p "Run puck-finder:<skill>…"
 ```
+
+**Headless** — for sites with a public JSON API. Fast (~3s), no Chrome, no
+LLM session. A standalone TypeScript scanner under `scanners/<name>.ts`
+runs under bun.
+
+```
+launchd plist  ─▶  bin/bash run-headless-scan.sh <scanner>  ─▶
+  bun run scheduler/scanners/<scanner>.ts
+```
+
+Prefer headless wherever the source exposes structured data — it's
+deterministic, debuggable, and avoids the failure modes of the LLM path.
 
 - `run-scan.sh` is the only entry point. Takes one positional arg: the skill
   slug (e.g. `nepean-hockey-school`).
@@ -23,6 +40,16 @@ launchd plist  ─▶  bin/bash run-scan.sh <skill>  ─▶  caffeinate -i  ─�
   status_changed / archived). MC's `/puck-finder?view=scans` tab + the
   per-scan detail page surface that automatically — no separate UI work
   needed per provider.
+
+## Currently scheduled
+
+| Provider                 | Runner   | Time (ET) | Plist label                                              |
+|--------------------------|----------|-----------|----------------------------------------------------------|
+| nepean-hockey-school     | Chrome   | 03:00     | `co.buyerson.puckfinder-nepean-hockey-school`            |
+| perfect-skating-ottawa   | Headless | 03:10     | `co.buyerson.puckfinder-perfect-skating-ottawa`          |
+
+Stagger by ≥10 min so the Chrome ones don't fight over the browser
+extension and so logs stay readable.
 
 ## Installing the nepean-hockey-school job
 
@@ -64,13 +91,27 @@ rm ~/Library/LaunchAgents/co.buyerson.puckfinder-nepean-hockey-school.plist
 
 ## Adding more providers
 
+### Chrome-driven (LLM skill)
+Use for providers without a clean JSON API.
 1. Confirm the skill runs cleanly when invoked manually
-2. Copy the plist, change the `Label`, the third `ProgramArguments` entry
-   (the skill slug), and the `Hour`/`Minute`
-3. `cp` + `launchctl bootstrap` as above
+2. Copy `co.buyerson.puckfinder-nepean-hockey-school.plist`, change the
+   `Label`, the third `ProgramArguments` entry (skill slug), and the
+   `Hour`/`Minute`
+3. `cp` + `launchctl bootstrap`
+
+### Headless (preferred where the API exists)
+1. Drop `scanners/<provider>.ts` — a bun-runnable file that fetches,
+   normalizes, and POSTs to `puck-finder-api/scans`. See
+   `scanners/perfect-skating.ts` for the template.
+2. Smoke-test: `~/.bun/bin/bun run scheduler/scanners/<provider>.ts`
+3. Copy `co.buyerson.puckfinder-perfect-skating-ottawa.plist`, change the
+   `Label`, the third `ProgramArguments` entry (scanner name = filename
+   without `.ts`), and `Hour`/`Minute`
+4. `cp` + `launchctl bootstrap`
 
 Sequencing tip: stagger different providers by at least 10 minutes so
-Chrome / the Claude extension isn't asked to drive two sessions at once.
+the Chrome-driven ones don't fight over the browser extension and so
+log files stay readable.
 
 ## Known limitations
 

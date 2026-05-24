@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>co.buyerson.puckfinder-perfect-skating-ottawa</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/johnkotowski/Projects/puck-finder-plugin/scheduler/run-headless-scan.sh</string>
+    <string>perfect-skating</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/johnkotowski/Projects/puck-finder-plugin</string>
+
+  <!-- 03:10 local (system TZ = America/Toronto). 10min stagger from the
+       nepean-hockey-school 03:00 run to keep daily slots predictable.
+       Headless scanner so no Chrome contention, but stagger is still good
+       hygiene as we add more providers. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>3</integer>
+    <key>Minute</key>
+    <integer>10</integer>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/johnkotowski/Library/Logs/puckfinder-scheduler/launchd-perfect-skating.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/johnkotowski/Library/Logs/puckfinder-scheduler/launchd-perfect-skating.err.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>/Users/johnkotowski</string>
+    <key>PATH</key>
+    <string>/Users/johnkotowski/.bun/bin:/Users/johnkotowski/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+  </dict>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>LowPriorityIO</key>
+  <true/>
+</dict>
+</plist>
