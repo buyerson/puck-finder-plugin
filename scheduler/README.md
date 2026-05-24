@@ -47,6 +47,7 @@ deterministic, debuggable, and avoids the failure modes of the LLM path.
 |--------------------------|----------|-----------|----------------------------------------------------------|
 | nepean-hockey-school     | Chrome   | 03:00     | `co.buyerson.puckfinder-nepean-hockey-school`            |
 | perfect-skating-ottawa   | Headless | 03:10     | `co.buyerson.puckfinder-perfect-skating-ottawa`          |
+| summit-goaltending       | Headless | 03:20     | `co.buyerson.puckfinder-summit-goaltending`              |
 
 Stagger by ≥10 min so the Chrome ones don't fight over the browser
 extension and so logs stay readable.

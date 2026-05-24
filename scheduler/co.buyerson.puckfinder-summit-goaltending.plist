@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>co.buyerson.puckfinder-summit-goaltending</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/johnkotowski/Projects/puck-finder-plugin/scheduler/run-headless-scan.sh</string>
+    <string>summit-goaltending</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/johnkotowski/Projects/puck-finder-plugin</string>
+
+  <!-- 03:20 ET (10min stagger from perfect-skating 03:10). Headless, so no
+       Chrome contention, but the stagger keeps logs readable. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>3</integer>
+    <key>Minute</key>
+    <integer>20</integer>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/johnkotowski/Library/Logs/puckfinder-scheduler/launchd-summit.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/johnkotowski/Library/Logs/puckfinder-scheduler/launchd-summit.err.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>/Users/johnkotowski</string>
+    <key>PATH</key>
+    <string>/Users/johnkotowski/.bun/bin:/Users/johnkotowski/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+  </dict>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>LowPriorityIO</key>
+  <true/>
+</dict>
+</plist>
