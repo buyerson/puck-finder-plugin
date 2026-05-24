@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>co.buyerson.puckfinder-nepean-hockey-school</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/johnkotowski/Projects/puck-finder-plugin/scheduler/run-scan.sh</string>
+    <string>nepean-hockey-school</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/johnkotowski/Projects/puck-finder-plugin</string>
+
+  <!-- 03:00 local (system TZ = America/Toronto). launchd auto-fires on next
+       wake if the Mac was asleep at the scheduled time. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>3</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/johnkotowski/Library/Logs/puckfinder-scheduler/launchd.out.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/johnkotowski/Library/Logs/puckfinder-scheduler/launchd.err.log</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>/Users/johnkotowski</string>
+    <key>PATH</key>
+    <string>/Users/johnkotowski/.bun/bin:/Users/johnkotowski/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>LANG</key>
+    <string>en_US.UTF-8</string>
+  </dict>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+  <key>LowPriorityIO</key>
+  <true/>
+</dict>
+</plist>
