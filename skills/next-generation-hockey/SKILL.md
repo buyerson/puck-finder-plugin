@@ -19,12 +19,23 @@ Do NOT attempt to use WebFetch or other non-browser tools - the page content mus
 
 ## Program Naming Rules (CRITICAL for deduplication)
 
-1. Use the program/series name EXACTLY as it appears on the website. Do not rephrase, abbreviate, or embellish.
-2. Do NOT prepend dates, day names, or months to the program name. The date goes in start_date, not in program_name.
-3. If a program has a subtitle or qualifier in parentheses on the website, include it. If it doesn't, don't add one.
-4. For multi-day camps/series, use the SAME program_name for every session in the series. Differentiate sessions by start_date, not by name.
-5. For locations with multiple rinks/pads, put the specific rink name in a separate field if available, but keep location as the facility name only (e.g. "Pinecrest Recreation Complex", NOT "Pinecrest Recreation Complex (Barbara Ann Scott)").
-6. For camps, name them as the series (e.g. "March Break Camp"), not with the specific date in the name. Do NOT include day-of-week or date in program_name.
+The DB dedups on a slug of `program_name` + `start_date` + `start_time`. **Any spelling drift in the name creates a duplicate session row** — "Aug 4-7" vs "August 4-7" once produced 9 visible duplicates in the app. Follow these rules exactly:
+
+1. **Reconcile against existing sessions FIRST (mandatory).** Before composing names, fetch this provider's current sessions:
+   ```bash
+   curl -s "https://erjeeuhlgfclrcpirprj.supabase.co/functions/v1/puck-finder-api/sessions?provider_slug=next-generation-hockey&is_active=true" \
+     -H "x-api-key: pf-write-k8x7m2nQ9vR4" \
+     | jq -r '.. | objects | select(.program_name?) | "\(.start_date)|\(.start_time)|\(.program_name)"' | sort -u
+   ```
+   If a scraped session matches an existing row on `start_date` + `start_time`, **reuse the existing `program_name` character-for-character**, even if you would have formatted it differently. Mint a new name ONLY for slots that don't exist yet.
+2. For NEW names, use the program/series name EXACTLY as it appears on the website. Do not rephrase or embellish.
+3. **Month format in camp-week names: always 3-letter abbreviation, title case** — `Aug 4-7`, `Jul 6-10` — even though the site prints "AUGUST 4-7". Never spell the month out, never vary the format between scans.
+4. Time-slot qualifiers come from the site's slot labels, in parentheses, title case: `(Morning #1)`, `(Morning #2)`, `(Afternoon)`. If the page lists only ONE slot for a week, add NO qualifier. Never submit both a qualified and an unqualified row for the same week + time.
+5. Submit one session per time slot per week — never an extra "summary" row for the same camp without times. A row with null start_time duplicates the per-slot rows (this happened with the Elite D/F clinics).
+6. If a program has a subtitle or qualifier in parentheses on the website, include it. If it doesn't, don't add one.
+7. For multi-week series (4v4, Complete Player Development), use the SAME program_name for every occurrence; differentiate by start_date, not by name. Don't rename an existing series row (e.g. "Spring 4v4 Hockey (2020/21 born)" must not come back as "Spring 4v4 League - 2020/21 Division").
+8. Each camp WEEK is its own program_name with the week range in it (established convention: `Weekly Summer Camp - Aug 10-14 (Morning #1)`). For single-occurrence camps (March Break / PD Day sessions), name them as the series without the date and differentiate by start_date.
+9. For locations with multiple rinks/pads, put the specific rink name in a separate field if available, but keep location as the facility name only (e.g. "Pinecrest Recreation Complex", NOT "Pinecrest Recreation Complex (Barbara Ann Scott)").
 
 ## Arena/Location Naming Rules
 
